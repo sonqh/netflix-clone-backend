@@ -2,40 +2,45 @@ import { generateTokenAndSetCookie } from '~/utils/generate-token'
 import { User } from '../models/user.model'
 import bcryptjs from 'bcryptjs'
 import { Request, Response } from 'express'
+import BadRequest from '../errors/bad-request'
+import NotFoundError from '../errors/not-found'
+import UnauthorizedError from '../errors/unauthorized-error'
+import ApplicationError from '~/errors/application-error'
+import InternalServerError from '../errors/internal-server-error'
 
 export async function signup(req: Request, res: Response): Promise<void> {
   try {
     const { email, password, username } = req.body
 
     if (!email || !password || !username) {
-      res.status(400).json({ success: false, message: 'All fields are required' })
-      return
+      throw new BadRequest('All fields are required')
     }
 
+    // Format type:
+    // Regular expression to validate email format
+    // ^[^\s@]+: Ensures the email starts with one or more characters that are not whitespace or '@'
+    // @[^\s@]+: Ensures there is an '@' followed by one or more characters that are not whitespace or '@'
+    // \.[^\s@]+$: Ensures there is a '.' followed by one or more characters that are not whitespace or '@' at the end
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     if (!emailRegex.test(email)) {
-      res.status(400).json({ success: false, message: 'Invalid email' })
-      return
+      throw new BadRequest('Invalid email')
     }
 
     if (password.length < 6) {
-      res.status(400).json({ success: false, message: 'Password must be at least 6 characters' })
-      return
+      throw new BadRequest('Password must be at least 6 characters')
     }
 
     const existingUserByEmail = await User.findOne({ email })
 
     if (existingUserByEmail) {
-      res.status(400).json({ success: false, message: 'Email already exists' })
-      return
+      throw new BadRequest('Email already exists')
     }
 
     const existingUserByUsername = await User.findOne({ username })
 
     if (existingUserByUsername) {
-      res.status(400).json({ success: false, message: 'Username already exists' })
-      return
+      throw new BadRequest('Username already exists')
     }
 
     const salt = await bcryptjs.genSalt(10)
@@ -64,8 +69,13 @@ export async function signup(req: Request, res: Response): Promise<void> {
       }
     })
   } catch (error) {
-    console.log('Error in signup controller', (error as Error).message)
-    res.status(500).json({ success: false, message: 'Internal server error' })
+    if (error instanceof ApplicationError) {
+      res.status(error.status).json({ success: false, message: error.message })
+    } else {
+      console.log('Error in signup controller', (error as Error).message)
+      const internalError = new InternalServerError()
+      res.status(internalError.status).json({ success: false, message: internalError.message })
+    }
   }
 }
 
@@ -74,21 +84,18 @@ export async function login(req: Request, res: Response): Promise<void> {
     const { email, password } = req.body
 
     if (!email || !password) {
-      res.status(400).json({ success: false, message: 'All fields are required' })
-      return
+      throw new BadRequest('All fields are required')
     }
 
     const user = await User.findOne({ email })
     if (!user) {
-      res.status(404).json({ success: false, message: 'Invalid credentials' })
-      return
+      throw new NotFoundError('Invalid credentials')
     }
 
     const isPasswordCorrect = await bcryptjs.compare(password, user.password)
 
     if (!isPasswordCorrect) {
-      res.status(400).json({ success: false, message: 'Invalid credentials' })
-      return
+      throw new UnauthorizedError('Invalid credentials')
     }
 
     const token = generateTokenAndSetCookie(`${user._id}`, res)
@@ -102,8 +109,13 @@ export async function login(req: Request, res: Response): Promise<void> {
       }
     })
   } catch (error) {
-    console.log('Error in login controller', (error as Error).message)
-    res.status(500).json({ success: false, message: 'Internal server error' })
+    if (error instanceof ApplicationError) {
+      res.status(error.status).json({ success: false, message: error.message })
+    } else {
+      console.log('Error in login controller', (error as Error).message)
+      const internalError = new InternalServerError()
+      res.status(internalError.status).json({ success: false, message: internalError.message })
+    }
   }
 }
 
@@ -113,7 +125,8 @@ export async function logout(req: Request, res: Response): Promise<void> {
     res.status(200).json({ success: true, message: 'Logged out successfully' })
   } catch (error) {
     console.log('Error in logout controller', (error as Error).message)
-    res.status(500).json({ success: false, message: 'Internal server error' })
+    const internalError = new InternalServerError()
+    res.status(internalError.status).json({ success: false, message: internalError.message })
   }
 }
 
@@ -123,6 +136,7 @@ export async function authCheck(req: Request, res: Response): Promise<void> {
     res.status(200).json({ success: true, user: req.user })
   } catch (error) {
     console.log('Error in authCheck controller', (error as Error).message)
-    res.status(500).json({ success: false, message: 'Internal server error' })
+    const internalError = new InternalServerError()
+    res.status(internalError.status).json({ success: false, message: internalError.message })
   }
 }

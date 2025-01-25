@@ -1,13 +1,13 @@
 import { Router } from 'express'
-import { authCheck, login, logout, signup } from '~/controller/auth.controller'
+import { authCheck, login, logout, signup } from '~/controllers/auth.controller'
 import { protectRoute } from '~/middleware/protect-route'
 
-const authRrouter = Router()
+const authRouter = Router()
 
-authRrouter.post('/signup', signup)
-authRrouter.post('/login', login)
-authRrouter.post('/logout', logout)
+authRouter.post('/signup', signup)
+authRouter.post('/login', login)
+authRouter.post('/logout', logout)
 
-authRrouter.get('/authCheck', protectRoute, authCheck)
+authRouter.get('/authCheck', protectRoute, authCheck)
 
-export default authRrouter
+export default authRouter
