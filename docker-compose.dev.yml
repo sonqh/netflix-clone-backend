@@ -2,7 +2,7 @@ version: '1'
 
 services:
   mongo:
-    image: mongo:7.0
+    image: mongo:8.0
     container_name: mongo-dev
     restart: always
     networks:
