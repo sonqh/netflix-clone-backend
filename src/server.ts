@@ -11,6 +11,11 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Express + TypeScript Server')
 })
 
+// New route added for testing
+app.get('/test', (req: Request, res: Response) => {
+  res.send('This is a test route')
+})
+
 app.listen(port, () => {
   logger.info(`Server is running at http://localhost:${port}`)
 })
