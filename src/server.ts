@@ -16,6 +16,8 @@ app.get('/test', (req: Request, res: Response) => {
   res.send('This is a test route')
 })
 
+console.log('This is a test log message')
+
 app.listen(port, () => {
   logger.info(`Server is running at http://localhost:${port}`)
 })
