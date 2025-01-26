@@ -1,11 +1,9 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { fetchFromTMDB } from '../services/tmdb.service'
 import { Movie, Video, MovieDetails } from 'tmdb-ts'
-import ApplicationError from '../errors/application-error'
 import NotFoundError from '../errors/not-found'
-import InternalServerError from '../errors/internal-server-error'
 
-export async function getTrendingMovie(req: Request, res: Response): Promise<void> {
+export async function getTrendingMovie(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const data = await fetchFromTMDB<{ results: Movie[] }>(
       'https://api.themoviedb.org/3/trending/movie/day?language=en-US'
@@ -15,17 +13,11 @@ export async function getTrendingMovie(req: Request, res: Response): Promise<voi
 
     res.json({ success: true, content: randomMovie })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getTrendingMovie controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function getMovieTrailers(req: Request, res: Response): Promise<void> {
+export async function getMovieTrailers(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data = await fetchFromTMDB<{ results: Video[] }>(
@@ -34,40 +26,28 @@ export async function getMovieTrailers(req: Request, res: Response): Promise<voi
     res.json({ success: true, trailers: data.results })
   } catch (error) {
     if ((error as Error).message.includes('404')) {
-      throw new NotFoundError('Movie not found')
-    }
-
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
+      next(new NotFoundError('Movie not found'))
     } else {
-      console.log('Error in getMovieTrailers controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
+      next(error)
     }
   }
 }
 
-export async function getMovieDetails(req: Request, res: Response): Promise<void> {
+export async function getMovieDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data = await fetchFromTMDB<MovieDetails>(`https://api.themoviedb.org/3/movie/${id}?language=en-US`)
     res.status(200).json({ success: true, content: data })
   } catch (error) {
     if ((error as Error).message.includes('404')) {
-      throw new NotFoundError('Movie not found')
-    }
-
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
+      next(new NotFoundError('Movie not found'))
     } else {
-      console.log('Error in getMovieDetails controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
+      next(error)
     }
   }
 }
 
-export async function getSimilarMovies(req: Request, res: Response): Promise<void> {
+export async function getSimilarMovies(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data = await fetchFromTMDB<{ results: Movie[] }>(
@@ -75,17 +55,11 @@ export async function getSimilarMovies(req: Request, res: Response): Promise<voi
     )
     res.status(200).json({ success: true, similar: data.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getSimilarMovies controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function getMoviesByCategory(req: Request, res: Response): Promise<void> {
+export async function getMoviesByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { category } = req.params
   try {
     const data = await fetchFromTMDB<{ results: Movie[] }>(
@@ -93,12 +67,6 @@ export async function getMoviesByCategory(req: Request, res: Response): Promise<
     )
     res.status(200).json({ success: true, content: data.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getMoviesByCategory controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }

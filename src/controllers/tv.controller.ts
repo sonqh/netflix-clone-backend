@@ -1,11 +1,9 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { fetchFromTMDB } from '../services/tmdb.service.js'
 import { TVWithMediaType, Video, TV } from 'tmdb-ts'
-import ApplicationError from '../errors/application-error'
 import NotFoundError from '../errors/not-found'
-import InternalServerError from '../errors/internal-server-error'
 
-export async function getTrendingTv(req: Request, res: Response): Promise<void> {
+export async function getTrendingTv(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const data: { results: TVWithMediaType[] } = await fetchFromTMDB(
       'https://api.themoviedb.org/3/trending/tv/day?language=en-US'
@@ -14,17 +12,11 @@ export async function getTrendingTv(req: Request, res: Response): Promise<void> 
 
     res.json({ success: true, content: randomMovie })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getTrendingTv controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function getTvTrailers(req: Request, res: Response): Promise<void> {
+export async function getTvTrailers(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data: { results: Video[] } = await fetchFromTMDB(
@@ -32,41 +24,29 @@ export async function getTvTrailers(req: Request, res: Response): Promise<void> 
     )
     res.json({ success: true, trailers: data.results })
   } catch (error) {
-    if (error instanceof Error && error.message.includes('404')) {
-      throw new NotFoundError('TV show not found')
-    }
-
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
+    if ((error as Error).message.includes('404')) {
+      next(new NotFoundError('TV show not found'))
     } else {
-      console.log('Error in getTvTrailers controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
+      next(error)
     }
   }
 }
 
-export async function getTvDetails(req: Request, res: Response): Promise<void> {
+export async function getTvDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data: TV = await fetchFromTMDB(`https://api.themoviedb.org/3/tv/${id}?language=en-US`)
     res.status(200).json({ success: true, content: data })
   } catch (error) {
-    if (error instanceof Error && error.message.includes('404')) {
-      throw new NotFoundError('TV show not found')
-    }
-
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
+    if ((error as Error).message.includes('404')) {
+      next(new NotFoundError('TV show not found'))
     } else {
-      console.log('Error in getTvDetails controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
+      next(error)
     }
   }
 }
 
-export async function getSimilarTvs(req: Request, res: Response): Promise<void> {
+export async function getSimilarTvs(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
     const data: { results: TV[] } = await fetchFromTMDB(
@@ -74,17 +54,11 @@ export async function getSimilarTvs(req: Request, res: Response): Promise<void> 
     )
     res.status(200).json({ success: true, similar: data.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getSimilarTvs controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function getTvsByCategory(req: Request, res: Response): Promise<void> {
+export async function getTvsByCategory(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { category } = req.params
   try {
     const data: { results: TV[] } = await fetchFromTMDB(
@@ -92,12 +66,6 @@ export async function getTvsByCategory(req: Request, res: Response): Promise<voi
     )
     res.status(200).json({ success: true, content: data.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getTvsByCategory controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }

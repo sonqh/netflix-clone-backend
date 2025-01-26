@@ -1,10 +1,10 @@
 import bodyParser from 'body-parser'
 import compression from 'compression'
-import express, { NextFunction, Request, Response } from 'express'
-import ApplicationError from './errors/application-error'
-import logger from './logger'
-import router from './routes'
 import cookieParser from 'cookie-parser'
+import express, { NextFunction, Request, Response } from 'express'
+import logger from './logger'
+import { errorHandler } from './middleware/error-handler'
+import router from './routes'
 
 const app = express()
 
@@ -33,14 +33,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(router)
 
 // Error-handling middleware
-app.use((err: ApplicationError, req: Request, res: Response, next: NextFunction) => {
-  if (res.headersSent) {
-    return next(err)
-  }
-
-  res.status(err.status || 500).json({
-    error: err.message
-  })
-})
+app.use(errorHandler)
 
 export default app

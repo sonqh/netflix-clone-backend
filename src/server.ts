@@ -13,10 +13,12 @@ import app from './app'
 
 const PORT = process.env.PORT || 3000
 
-let debugCallback
+type DebugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: string) => void
+
+let debugCallback: DebugCallback | undefined
 if (process.env.NODE_ENV === 'development') {
-  debugCallback = (collectionName: string, method: string, query: any, doc: string): void => {
-    const message = `${collectionName}.${method}(${util.inspect(query, { colors: true, depth: null })})`
+  debugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: string): void => {
+    const message = `${collectionName}.${method}(${util.inspect(query, { colors: true, depth: null })}) - doc: ${doc}`
     logger.log({
       level: 'verbose',
       message,

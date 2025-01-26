@@ -4,7 +4,7 @@ import { User } from '~/models/user.model'
 import InternalServerError from '~/errors/internal-server-error'
 import NotFoundError from '~/errors/not-found'
 import UnauthorizedError from '~/errors/unauthorized-error'
-import ApplicationError from '~/errors/application-error'
+import logger from '../logger'
 
 interface DecodedToken extends JwtPayload {
   userId: string
@@ -37,12 +37,10 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
     req.user = user
     next()
   } catch (error) {
-    console.error('Error in protectRoute middleware:', (error as Error).message)
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    logger.error('Error in protectRoute middleware:', {
+      message: (error as Error).message,
+      stack: (error as Error).stack
+    })
+    next(error)
   }
 }

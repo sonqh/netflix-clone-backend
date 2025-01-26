@@ -1,12 +1,10 @@
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import { User } from '../models/user.model.js'
 import { fetchFromTMDB } from '../services/tmdb.service.js'
 import { PersonWithMediaType, MovieWithMediaType, TVWithMediaType } from 'tmdb-ts'
-import ApplicationError from '../errors/application-error'
 import NotFoundError from '../errors/not-found'
-import InternalServerError from '../errors/internal-server-error'
 
-export async function searchPerson(req: Request, res: Response): Promise<void> {
+export async function searchPerson(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params
   try {
     const response: { results: PersonWithMediaType[] } = await fetchFromTMDB(
@@ -31,17 +29,11 @@ export async function searchPerson(req: Request, res: Response): Promise<void> {
 
     res.status(200).json({ success: true, content: response.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in searchPerson controller: ', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function searchMovie(req: Request, res: Response): Promise<void> {
+export async function searchMovie(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params
 
   try {
@@ -66,17 +58,11 @@ export async function searchMovie(req: Request, res: Response): Promise<void> {
     })
     res.status(200).json({ success: true, content: response.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in searchMovie controller: ', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function searchTv(req: Request, res: Response): Promise<void> {
+export async function searchTv(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params
 
   try {
@@ -101,31 +87,19 @@ export async function searchTv(req: Request, res: Response): Promise<void> {
     })
     res.json({ success: true, content: response.results })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in searchTv controller: ', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function getSearchHistory(req: Request, res: Response): Promise<void> {
+export async function getSearchHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     res.status(200).json({ success: true, content: req.user.searchHistory })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in getSearchHistory controller: ', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function removeItemFromSearchHistory(req: Request, res: Response): Promise<void> {
+export async function removeItemFromSearchHistory(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
 
   const parsedId = parseInt(id)
@@ -139,12 +113,6 @@ export async function removeItemFromSearchHistory(req: Request, res: Response): 
 
     res.status(200).json({ success: true, message: 'Item removed from search history' })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in removeItemFromSearchHistory controller: ', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }

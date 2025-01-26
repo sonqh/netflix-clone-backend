@@ -7,7 +7,7 @@ interface SafeMongooseConnectionOptions {
   mongoUrl: string
   mongooseConnectionOptions?: ConnectOptions
   retryDelayMs?: number
-  debugCallback?: (collectionName: string, method: string, query: any, doc: string) => void
+  debugCallback?: (collectionName: string, method: string, query: Record<string, unknown>, doc: string) => void
   onStartConnection?: (mongoUrl: string) => void
   onConnectionError?: (error: Error, mongoUrl: string) => void
   onConnectionRetry?: (mongoUrl: string) => void
@@ -25,6 +25,7 @@ const defaultMongooseConnectionOptions: ConnectOptions = {
  * This library tries to auto-reconnect to
  * MongoDB without crashing the server.
  * @author Sidhant Panda
+ * @modifiedBy SonQuach
  */
 export default class SafeMongooseConnection {
   /** Safe Mongoose Connection options */

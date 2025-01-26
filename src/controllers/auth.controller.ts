@@ -1,14 +1,12 @@
 import { generateTokenAndSetCookie } from '~/utils/generate-token'
 import { User } from '../models/user.model'
 import bcryptjs from 'bcryptjs'
-import { Request, Response } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import BadRequest from '../errors/bad-request'
 import NotFoundError from '../errors/not-found'
 import UnauthorizedError from '../errors/unauthorized-error'
-import ApplicationError from '~/errors/application-error'
-import InternalServerError from '../errors/internal-server-error'
 
-export async function signup(req: Request, res: Response): Promise<void> {
+export async function signup(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password, username } = req.body
 
@@ -16,11 +14,6 @@ export async function signup(req: Request, res: Response): Promise<void> {
       throw new BadRequest('All fields are required')
     }
 
-    // Format type:
-    // Regular expression to validate email format
-    // ^[^\s@]+: Ensures the email starts with one or more characters that are not whitespace or '@'
-    // @[^\s@]+: Ensures there is an '@' followed by one or more characters that are not whitespace or '@'
-    // \.[^\s@]+$: Ensures there is a '.' followed by one or more characters that are not whitespace or '@' at the end
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     if (!emailRegex.test(email)) {
@@ -69,17 +62,11 @@ export async function signup(req: Request, res: Response): Promise<void> {
       }
     })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in signup controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function login(req: Request, res: Response): Promise<void> {
+export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password } = req.body
 
@@ -109,34 +96,24 @@ export async function login(req: Request, res: Response): Promise<void> {
       }
     })
   } catch (error) {
-    if (error instanceof ApplicationError) {
-      res.status(error.status).json({ success: false, message: error.message })
-    } else {
-      console.log('Error in login controller', (error as Error).message)
-      const internalError = new InternalServerError()
-      res.status(internalError.status).json({ success: false, message: internalError.message })
-    }
+    next(error)
   }
 }
 
-export async function logout(req: Request, res: Response): Promise<void> {
+export async function logout(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     res.clearCookie('jwt-netflix')
     res.status(200).json({ success: true, message: 'Logged out successfully' })
   } catch (error) {
-    console.log('Error in logout controller', (error as Error).message)
-    const internalError = new InternalServerError()
-    res.status(internalError.status).json({ success: false, message: internalError.message })
+    next(error)
   }
 }
 
-export async function authCheck(req: Request, res: Response): Promise<void> {
+export async function authCheck(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     console.log('req.user:', req.user)
     res.status(200).json({ success: true, user: req.user })
   } catch (error) {
-    console.log('Error in authCheck controller', (error as Error).message)
-    const internalError = new InternalServerError()
-    res.status(internalError.status).json({ success: false, message: internalError.message })
+    next(error)
   }
 }

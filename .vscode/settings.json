@@ -1,0 +1,16 @@
+{
+  "jest.runMode": {
+    "type": "on-demand",
+    "coverage": true
+  },
+  "jest.debugCodeLens.showWhenTestStateIn": ["fail", "pass"],
+  "jest.coverageColors": {
+    "covered": "green",
+    "notCovered": "red",
+    "partial": "yellow"
+  },
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  }
+}
