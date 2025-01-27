@@ -1,20 +1,17 @@
 import bodyParser from 'body-parser'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
-import express, { NextFunction, Request, Response } from 'express'
 import cors from 'cors'
+
+import express, { NextFunction, Request, Response } from 'express'
 import logger from './logger'
 import { errorHandler } from './middleware/error-handler'
 import router from './routes'
-import dotenv from 'dotenv'
+import dotenvConfig from './config/dotenv.config'
 
 const app = express()
 
-const result = dotenv.config()
-
-if (result.error) {
-  dotenv.config({ path: '.env.default' })
-}
+dotenvConfig.config()
 
 // Enable CORS
 app.use(

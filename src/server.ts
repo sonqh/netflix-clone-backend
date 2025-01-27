@@ -12,7 +12,8 @@ import SafeMongooseConnection from './lib/safe-mongoose-connection'
 import logger from './logger'
 import app from './app'
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT ?? 3000
+const API_VERSION = process.env.API_VERSION ?? 'v1'
 
 type DebugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: string) => void
 
@@ -47,7 +48,7 @@ const serve = () =>
 
     if (process.env.NODE_ENV === 'development') {
       // This route is only present in development mode
-      logger.info(`⚙️  Swagger UI hosted at http://localhost:${PORT}/dev/api-docs`)
+      logger.info(`⚙️  Swagger UI hosted at http://localhost:${PORT}/api/${API_VERSION}/dev/api-docs`)
     }
   })
 

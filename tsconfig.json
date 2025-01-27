@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "module": "commonjs",
+    // "module": "esnext",
     "target": "ES2023",
-    "outDir": "dist",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "strict": true,
     "skipLibCheck": true,
