@@ -1,16 +1,11 @@
-import dotenv from 'dotenv'
-
-const result = dotenv.config()
-
-if (result.error) {
-  dotenv.config({ path: '.env.default' })
-}
-
 import util from 'util'
 
 import SafeMongooseConnection from './lib/safe-mongoose-connection'
 import logger from './logger'
 import app from './app'
+import dotenvConfig from './config/dotenv.config'
+
+dotenvConfig.config()
 
 const PORT = process.env.PORT ?? 3000
 const API_VERSION = process.env.API_VERSION ?? 'v1'
