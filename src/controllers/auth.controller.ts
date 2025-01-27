@@ -111,7 +111,6 @@ export async function logout(req: Request, res: Response, next: NextFunction): P
 
 export async function authCheck(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    console.log('req.user:', req.user)
     res.status(200).json({ success: true, user: req.user })
   } catch (error) {
     next(error)

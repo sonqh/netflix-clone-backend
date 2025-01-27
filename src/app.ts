@@ -2,11 +2,29 @@ import bodyParser from 'body-parser'
 import compression from 'compression'
 import cookieParser from 'cookie-parser'
 import express, { NextFunction, Request, Response } from 'express'
+import cors from 'cors'
 import logger from './logger'
 import { errorHandler } from './middleware/error-handler'
 import router from './routes'
+import dotenv from 'dotenv'
 
 const app = express()
+
+const result = dotenv.config()
+
+if (result.error) {
+  dotenv.config({ path: '.env.default' })
+}
+
+// Enable CORS
+app.use(
+  cors({
+    origin: process.env.FRONTEND_ORIGIN,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+  })
+)
 
 function logResponseTime(req: Request, res: Response, next: NextFunction) {
   const startHrTime = process.hrtime()
