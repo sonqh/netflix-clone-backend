@@ -7,8 +7,8 @@ import express from 'express'
 import dotenvConfig from './config/dotenv.config'
 import { errorHandler } from './middleware/error-handler'
 import logResponseTime from './middleware/log-response-time'
-import preventDuplicateMiddleware from './middleware/prevent-duplicate.middleware'
 import router from './routes'
+import rateLimitMiddleware from './middleware/rate-limit.middleware'
 
 const app = express()
 
@@ -29,7 +29,7 @@ app.use(cookieParser())
 app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-app.use(preventDuplicateMiddleware)
+app.use(rateLimitMiddleware)
 app.use(router)
 
 // Error-handling middleware
