@@ -4,6 +4,7 @@ import { fetchFromTMDB } from '../services/tmdb.service'
 import NotFoundError from '../errors/not-found'
 import { Movie, MovieDetails } from '@plotwist_app/tmdb'
 import { Trailer } from '~/types/types'
+import { User } from '~/models/user.model'
 
 export async function getTrendingMovie(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -39,6 +40,18 @@ export async function getMovieDetails(req: Request, res: Response, next: NextFun
   const { id } = req.params
   try {
     const data = await fetchFromTMDB<MovieDetails>(`https://api.themoviedb.org/3/movie/${id}?language=en-US`)
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: {
+        searchHistory: {
+          id: id,
+          image: data.poster_path,
+          title: data.title,
+          searchType: 'movie',
+          createdAt: new Date()
+        }
+      }
+    })
     res.status(200).json({ success: true, detail: data })
   } catch (error) {
     if ((error as Error).message.includes('404')) {

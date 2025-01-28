@@ -3,6 +3,7 @@ import { fetchFromTMDB } from '../services/tmdb.service.js'
 
 import NotFoundError from '../errors/not-found'
 import { TvCrew, TvSerie, TvSerieDetails, TvSerieWithMediaType, Video } from '@plotwist_app/tmdb'
+import { User } from '~/models/user.model.js'
 
 export async function getTrendingTv(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -36,7 +37,19 @@ export async function getTvTrailers(req: Request, res: Response, next: NextFunct
 export async function getTvDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
-    const data: TvSerieDetails = await fetchFromTMDB(`https://api.themoviedb.org/3/tv/${id}?language=en-US`)
+    const data = await fetchFromTMDB<TvSerieDetails>(`https://api.themoviedb.org/3/tv/${id}?language=en-US`)
+
+    await User.findByIdAndUpdate(req.user._id, {
+      $push: {
+        searchHistory: {
+          id: id,
+          image: data.poster_path,
+          title: data.name,
+          searchType: 'tv',
+          createdAt: new Date()
+        }
+      }
+    })
     res.status(200).json({ success: true, detail: data })
   } catch (error) {
     if ((error as Error).message.includes('404')) {
