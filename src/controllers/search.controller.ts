@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { User } from '../models/user.model.js'
 import { fetchFromTMDB } from '../services/tmdb.service.js'
-import { PersonWithMediaType, MovieWithMediaType, TVWithMediaType } from 'tmdb-ts'
+
 import NotFoundError from '../errors/not-found'
+import { MovieWithMediaType, PersonWithMediaType, TvSerieWithMediaType } from '@plotwist_app/tmdb'
 
 export async function searchPerson(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params
@@ -66,7 +67,7 @@ export async function searchTv(req: Request, res: Response, next: NextFunction):
   const { query } = req.params
 
   try {
-    const response: { results: TVWithMediaType[] } = await fetchFromTMDB(
+    const response: { results: TvSerieWithMediaType[] } = await fetchFromTMDB(
       `https://api.themoviedb.org/3/search/tv?query=${query}&include_adult=false&language=en-US&page=1`
     )
 

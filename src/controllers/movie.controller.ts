@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
 import { fetchFromTMDB } from '../services/tmdb.service'
-import { Movie, Video, MovieDetails } from 'tmdb-ts'
+
 import NotFoundError from '../errors/not-found'
+import { Movie, MovieDetails } from '@plotwist_app/tmdb'
+import { Trailer } from '~/types/types'
 
 export async function getTrendingMovie(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -20,7 +22,7 @@ export async function getTrendingMovie(req: Request, res: Response, next: NextFu
 export async function getMovieTrailers(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params
   try {
-    const data = await fetchFromTMDB<{ results: Video[] }>(
+    const data = await fetchFromTMDB<{ results: Trailer[] }>(
       `https://api.themoviedb.org/3/movie/${id}/videos?language=en-US`
     )
     res.json({ success: true, trailers: data.results })
@@ -37,7 +39,7 @@ export async function getMovieDetails(req: Request, res: Response, next: NextFun
   const { id } = req.params
   try {
     const data = await fetchFromTMDB<MovieDetails>(`https://api.themoviedb.org/3/movie/${id}?language=en-US`)
-    res.status(200).json({ success: true, content: data })
+    res.status(200).json({ success: true, detail: data })
   } catch (error) {
     if ((error as Error).message.includes('404')) {
       next(new NotFoundError('Movie not found'))
