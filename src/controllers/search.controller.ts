@@ -49,7 +49,7 @@ export async function searchMovie(req: Request, res: Response, next: NextFunctio
       $push: {
         searchHistory: {
           id: response.results[0].id,
-          image: response.results[0].poster_path,
+          image: response.results[0].backdrop_path,
           title: response.results[0].title,
           searchType: 'movie',
           createdAt: new Date()
@@ -78,7 +78,7 @@ export async function searchTv(req: Request, res: Response, next: NextFunction):
       $push: {
         searchHistory: {
           id: response.results[0].id,
-          image: response.results[0].poster_path,
+          image: response.results[0].backdrop_path,
           title: response.results[0].name,
           searchType: 'tv',
           createdAt: new Date()
