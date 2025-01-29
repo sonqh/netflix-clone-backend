@@ -3,6 +3,15 @@ import ApplicationError from '../errors/application-error'
 import InternalServerError from '../errors/internal-server-error'
 import logger from '../logger'
 
+/**
+ * Middleware to handle errors in the application.
+ *
+ * @param {ApplicationError | Error} err - The error object.
+ * @param {Request} req - The incoming request object.
+ * @param {Response} res - The outgoing response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {void} - This middleware does not return a value.
+ */
 export const errorHandler = (err: ApplicationError | Error, req: Request, res: Response, next: NextFunction): void => {
   if (res.headersSent) {
     return next(err)

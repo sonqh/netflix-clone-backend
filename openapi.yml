@@ -254,6 +254,25 @@ paths:
       responses:
         '200':
           description: Item removed from search history
+  /cache:
+    get:
+      summary: Get cached data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cached data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data to be cached
+        '500':
+          description: Internal server error
+
 components:
   securitySchemes:
     bearerAuth:

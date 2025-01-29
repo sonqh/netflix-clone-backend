@@ -1,21 +1,22 @@
 import util from 'util'
 
-import SafeMongooseConnection from './lib/safe-mongoose-connection'
+import SafeMongooseConnection, { DebugCallback } from './lib/safe-mongoose-connection'
 import logger from './logger'
 import app from './app'
 import dotenvConfig from './config/dotenv.config'
+import mongoose from 'mongoose'
 
 dotenvConfig.config()
 
 const PORT = process.env.PORT ?? 3000
 const API_VERSION = process.env.API_VERSION ?? 'v1'
 
-type DebugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: string) => void
-
 let debugCallback: DebugCallback | undefined
 if (process.env.NODE_ENV === 'development') {
-  debugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: string): void => {
-    const message = `${collectionName}.${method}(${util.inspect(query, { colors: true, depth: null })}) - doc: ${doc}`
+  debugCallback = (collectionName: string, method: string, query: Record<string, unknown>, doc: unknown): void => {
+    const processedDoc = doc instanceof mongoose.Document ? doc.toObject({ flattenMaps: true, versionKey: false }) : doc
+
+    const message = `${collectionName}.${method}(${util.inspect(query, { colors: true, depth: null })}) - doc: ${util.inspect(processedDoc, { colors: true, depth: null })}`
     logger.log({
       level: 'verbose',
       message,

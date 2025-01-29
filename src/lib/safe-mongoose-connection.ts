@@ -3,11 +3,18 @@ import mongoose, { ConnectOptions } from 'mongoose'
 /** Callback for establishing or re-establishing mongo connection */
 type OnConnectedCallback = (mongoUrl: string) => void
 
+export type DebugCallback = (
+  collectionName: string,
+  method: string,
+  query: Record<string, unknown>,
+  doc: unknown
+) => void
+
 interface SafeMongooseConnectionOptions {
   mongoUrl: string
   mongooseConnectionOptions?: ConnectOptions
   retryDelayMs?: number
-  debugCallback?: (collectionName: string, method: string, query: Record<string, unknown>, doc: string) => void
+  debugCallback?: DebugCallback
   onStartConnection?: (mongoUrl: string) => void
   onConnectionError?: (error: Error, mongoUrl: string) => void
   onConnectionRetry?: (mongoUrl: string) => void

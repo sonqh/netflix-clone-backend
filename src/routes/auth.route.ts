@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { authCheck, login, logout, signup } from '~/controllers/auth.controller'
-import { protectRoute } from '~/middleware/protect-route'
+import { protectRoute } from '~/middleware/protect-route.middleware'
 
 const authRouter = Router()
 

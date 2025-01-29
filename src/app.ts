@@ -1,38 +1,27 @@
-import bodyParser from 'body-parser'
-import compression from 'compression'
-import cookieParser from 'cookie-parser'
-import cors from 'cors'
-
 import express from 'express'
-import dotenvConfig from './config/dotenv.config'
-import { errorHandler } from './middleware/error-handler'
-import logResponseTime from './middleware/log-response-time'
+import { configureExpress } from './config/express.config'
+import { redisClient } from './config/redis.config'
 import router from './routes'
+import logResponseTime from './middleware/log-response-time.middleware'
 import rateLimitMiddleware from './middleware/rate-limit.middleware'
-
+import { errorHandler } from './middleware/error-handler.middleware'
 const app = express()
 
-dotenvConfig.config()
+// Configure Express middleware
+configureExpress(app)
 
-// Enable CORS
-app.use(
-  cors({
-    origin: process.env.FRONTEND_ORIGIN,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  })
-)
-
+// Custom middlewares
 app.use(logResponseTime)
-app.use(cookieParser())
-app.use(compression())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
 app.use(rateLimitMiddleware)
+
+// Routes
 app.use(router)
 
-// Error-handling middleware
+// Error handling
 app.use(errorHandler)
+
+// Redis connection handling
+redisClient.on('connect', () => console.log('Connected to Redis'))
+redisClient.on('error', (err) => console.error('Redis Client Error', err))
 
 export default app

@@ -10,6 +10,17 @@ interface DecodedToken extends JwtPayload {
   userId: string
 }
 
+/**
+ * Middleware to protect routes by verifying JWT tokens.
+ *
+ * @param {Request} req - The incoming request object.
+ * @param {Response} res - The outgoing response object.
+ * @param {NextFunction} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves to void.
+ * @throws {UnauthorizedError} - If no token is provided or the token is invalid.
+ * @throws {InternalServerError} - If the JWT_SECRET is not defined.
+ * @throws {NotFoundError} - If the user is not found.
+ */
 export const protectRoute = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const token = req.cookies['jwt-netflix']
