@@ -19,4 +19,9 @@ router.use(`/api/${API_VERSION}/search`, protectRoute, searchRouter)
 // This route is only for checking the cache
 router.use(`/api/${API_VERSION}`, protectRoute, cacheRouter)
 
+// This route is only for health check
+router.get('/health', (req, res) => {
+  res.status(200).json({ status: 'UP' })
+})
+
 export default router

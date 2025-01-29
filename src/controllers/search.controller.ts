@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { User } from '../models/user.model.js'
-import { fetchFromTMDB } from '../services/tmdb.service.js'
+import { User } from '~/models/user.model'
+import { fetchFromTMDB } from '~/services/tmdb.service'
 
 import { MovieWithMediaType, PersonWithMediaType, TvSerieWithMediaType } from '@plotwist_app/tmdb'
-import { SearchResults } from '~/types/types.js'
-import NotFoundError from '../errors/not-found'
+import { SearchResults } from '~/types/types'
+import NotFoundError from '~/errors/not-found'
 
 export async function searchPerson(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params

@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { fetchFromTMDB } from '../services/tmdb.service.js'
+import { fetchFromTMDB } from '~/services/tmdb.service'
 
 import NotFoundError from '../errors/not-found'
 import { TvCrew, TvSerie, TvSerieDetails, TvSerieWithMediaType, Video } from '@plotwist_app/tmdb'
-import { User } from '~/models/user.model.js'
+import { User } from '~/models/user.model'
 
 export async function getTrendingTv(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
