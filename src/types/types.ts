@@ -10,3 +10,9 @@ export type Trailer = {
   published_at: string
   id: string
 }
+
+export type SearchResults<T> = {
+  success: boolean
+  results: T[]
+  total_results: number
+}

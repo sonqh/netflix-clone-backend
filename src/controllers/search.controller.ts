@@ -1,14 +1,15 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { User } from '../models/user.model.js'
 import { fetchFromTMDB } from '../services/tmdb.service.js'
 
-import NotFoundError from '../errors/not-found'
 import { MovieWithMediaType, PersonWithMediaType, TvSerieWithMediaType } from '@plotwist_app/tmdb'
+import { SearchResults } from '~/types/types.js'
+import NotFoundError from '../errors/not-found'
 
 export async function searchPerson(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { query } = req.params
   try {
-    const response: { results: PersonWithMediaType[] } = await fetchFromTMDB(
+    const response: SearchResults<PersonWithMediaType> = await fetchFromTMDB(
       `https://api.themoviedb.org/3/search/person?query=${query}&include_adult=false&language=en-US&page=1`
     )
 
@@ -52,7 +53,8 @@ export async function searchPerson(req: Request, res: Response, next: NextFuncti
       })
     }
 
-    res.status(200).json({ success: true, content: response.results })
+    // Because TMDB API doesn't include limit and offset in the response, we calculate the total pages based on the results length
+    res.status(200).json({ success: true, results: response.results, total_results: response.results.length })
   } catch (error) {
     next(error)
   }
@@ -62,7 +64,7 @@ export async function searchMovie(req: Request, res: Response, next: NextFunctio
   const { query } = req.params
 
   try {
-    const response: { results: MovieWithMediaType[] } = await fetchFromTMDB(
+    const response: SearchResults<MovieWithMediaType> = await fetchFromTMDB(
       `https://api.themoviedb.org/3/search/movie?query=${query}&include_adult=false&language=en-US&page=1`
     )
 
@@ -70,7 +72,7 @@ export async function searchMovie(req: Request, res: Response, next: NextFunctio
       throw new NotFoundError('Movie not found')
     }
 
-    res.status(200).json({ success: true, content: response.results })
+    res.status(200).json({ success: true, results: response.results, total_results: response.results.length })
   } catch (error) {
     next(error)
   }
@@ -80,7 +82,7 @@ export async function searchTv(req: Request, res: Response, next: NextFunction):
   const { query } = req.params
 
   try {
-    const response: { results: TvSerieWithMediaType[] } = await fetchFromTMDB(
+    const response: SearchResults<TvSerieWithMediaType> = await fetchFromTMDB(
       `https://api.themoviedb.org/3/search/tv?query=${query}&include_adult=false&language=en-US&page=1`
     )
 
@@ -88,7 +90,7 @@ export async function searchTv(req: Request, res: Response, next: NextFunction):
       throw new NotFoundError('TV show not found')
     }
 
-    res.json({ success: true, content: response.results })
+    res.json({ success: true, results: response.results, total_results: response.results.length })
   } catch (error) {
     next(error)
   }
