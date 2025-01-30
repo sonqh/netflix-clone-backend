@@ -108,6 +108,70 @@ To fix code formatting, use:
 npm run prettier:fix
 ```
 
+## API Documentation
+
+The API documentation is available and can be accessed using Swagger UI. It provides detailed information about the available endpoints, request parameters, and responses.
+
+### Accessing API Documentation
+
+In development mode, the Swagger UI is available at:
+
+```
+http://localhost:3000/api/v1/dev/api-docs
+```
+
+### OpenAPI Specification
+
+The OpenAPI specification for the API is defined in the `openapi.yml` file. It includes the following endpoints:
+
+- **Auth Routes**:
+
+  - `POST /auth/signup`: User signup
+  - `POST /auth/login`: User login
+  - `POST /auth/logout`: User logout
+  - `GET /auth/authCheck`: Check authentication status
+
+- **Movie Routes**:
+
+  - `GET /movie/trending`: Get trending movies
+  - `GET /movie/{id}/trailers`: Get movie trailers
+  - `GET /movie/{id}/details`: Get movie details
+  - `GET /movie/{id}/similar`: Get similar movies
+  - `GET /movie/{category}`: Get movies by category
+
+- **TV Routes**:
+
+  - `GET /tv/trending`: Get trending TV shows
+  - `GET /tv/{id}/trailers`: Get TV show trailers
+  - `GET /tv/{id}/details`: Get TV show details
+  - `GET /tv/{id}/similar`: Get similar TV shows
+  - `GET /tv/{category}`: Get TV shows by category
+
+- **Search Routes**:
+
+  - `GET /search/person/{query}`: Search for a person
+  - `GET /search/movie/{query}`: Search for a movie
+  - `GET /search/tv/{query}`: Search for a TV show
+  - `GET /search/history`: Get search history
+  - `DELETE /search/history/{id}`: Remove item from search history
+
+- **Cache Routes**:
+  - `GET /cache`: Get cached data
+
+### Security
+
+The API uses JWT for authentication. The security scheme is defined in the `openapi.yml` file under `components.securitySchemes.bearerAuth`.
+
+### Example Request
+
+Here is an example of how to make a request to the API using `curl`:
+
+```sh
+curl -X GET "http://localhost:3000/api/v1/movie/trending" -H "accept: application/json" -H "Authorization: Bearer JWT_TOKEN"
+```
+
+For more details, refer to the Swagger UI documentation.
+
 ## Configuration
 
 ### Eslint
