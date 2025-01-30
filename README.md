@@ -1,6 +1,6 @@
 # Netflix Clone
 
-A Netflix clone built with Node.js, Express, TypeScript, and Docker.
+A Netflix clone built with Node.js, Express, TypeScript, and Docker. This project aims to replicate the core functionalities of Netflix, including user authentication, movie and TV show browsing, and search capabilities. It leverages The Movie Database (TMDB) API to fetch movie and TV show data.
 
 ## Table of Contents
 
@@ -11,6 +11,7 @@ A Netflix clone built with Node.js, Express, TypeScript, and Docker.
 - [Testing](#testing)
 - [Linting and Formatting](#linting-and-formatting)
 - [Configuration](#configuration)
+- [Safe Mongoose Connection](#safe-mongoose-connection)
 - [License](#license)
 
 ## Installation
@@ -113,8 +114,84 @@ The ESLint configuration is defined in the `eslint.config.mjs` file.
 
 ### Prettier
 
-The Prettier configuration is defined in the `.prettie.config.mjs` file.
+The Prettier configuration is defined in the `prettier.config.mjs` file.
 
 ### Jest
 
 The Jest configuration is defined in the `jest.config.js` file.
+
+### Environment Variables
+
+The environment variables are configured using the `dotenv.config.ts` file.
+
+### Express
+
+The Express configuration is defined in the `express.config.ts` file.
+
+### Redis
+
+The Redis configuration is defined in the `redis.config.ts` file.
+
+### Commitlint
+
+The Commitlint configuration is defined in the `commitlint.config.js` file.
+
+### Routes
+
+- **Auth Routes**: Defined in `auth.route.ts`
+- **Movie Routes**: Defined in `movie.route.ts`
+- **TV Routes**: Defined in `tv.route.ts`
+- **Search Routes**: Defined in `search.route.ts`
+- **Documentation Routes**: Defined in `doc.route.ts`
+- **Cache Routes**: Defined in `cache.route.ts`
+
+### Middleware
+
+- **Protect Route Middleware**: Defined in `protect-route.middleware.ts`
+- **Cache Middleware**: Defined in `cache.middleware.ts`
+
+## Safe Mongoose Connection
+
+The `SafeMongooseConnection` class is a wrapper to help manage MongoDB connections using Mongoose. It handles automatic reconnection attempts and provides hooks for connection events.
+
+### Usage
+
+To use the `SafeMongooseConnection`, import it and create an instance with the required options:
+
+```typescript
+import SafeMongooseConnection from './path/to/safe-mongoose-connection'
+
+const mongoConnection = new SafeMongooseConnection({
+  mongoUrl: 'your-mongo-url',
+  retryDelayMs: 2000,
+  onStartConnection: (url) => console.log(`Connecting to ${url}`),
+  onConnectionError: (error, url) => console.error(`Error connecting to ${url}:`, error),
+  onConnectionRetry: (url) => console.log(`Retrying connection to ${url}`)
+})
+
+mongoConnection.connect((url) => {
+  console.log(`Connected to ${url}`)
+})
+```
+
+### Options
+
+- `mongoUrl`: The MongoDB connection string.
+- `mongooseConnectionOptions`: Optional Mongoose connection options.
+- `retryDelayMs`: Optional delay between reconnection attempts (default is 2000ms).
+- `debugCallback`: Optional callback for Mongoose debug logs.
+- `onStartConnection`: Optional callback when starting a connection.
+- `onConnectionError`: Optional callback for connection errors.
+- `onConnectionRetry`: Optional callback for connection retries.
+
+### Methods
+
+- `connect(onConnectedCallback)`: Starts the connection process and calls `onConnectedCallback` when connected.
+- `close(force)`: Closes the MongoDB connection.
+
+### Events
+
+- `onConnected`: Called when the connection is established.
+- `onReconnected`: Called when the connection is re-established after a disconnection.
+- `onError`: Called when there is a connection error.
+- `onDisconnected`: Called when the connection is lost.
