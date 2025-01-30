@@ -41,6 +41,7 @@ const safeMongooseConnection = new SafeMongooseConnection({
 const serve = () =>
   app.listen(PORT, () => {
     logger.info(`🌏 Express server started at http://localhost:${PORT}`)
+    logger.info(`🚀 API version: ${API_VERSION}`)
 
     if (process.env.NODE_ENV === 'development') {
       // This route is only present in development mode
