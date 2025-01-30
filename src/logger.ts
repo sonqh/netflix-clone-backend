@@ -1,5 +1,7 @@
 import { createLogger, format, transports } from 'winston'
 import ConsoleLogTransport from './lib/winston-console-transport'
+import dotenvConfig from './config/dotenv.config'
+dotenvConfig.config()
 
 const logTransports = [
   new transports.File({

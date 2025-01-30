@@ -1,0 +1,309 @@
+openapi: 3.0.0
+info:
+  title: Netflix Clone API
+  version: 1.0.0
+  description: API documentation for the Netflix Clone backend.
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /auth/signup:
+    post:
+      summary: User signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignup'
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad request
+  /auth/login:
+    post:
+      summary: User login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+      responses:
+        '200':
+          description: Successful login
+        '401':
+          description: Unauthorized
+  /auth/logout:
+    post:
+      summary: User logout
+      responses:
+        '200':
+          description: Successfully logged out
+  /auth/authCheck:
+    get:
+      summary: Check authentication status
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User is authenticated
+        '401':
+          description: Unauthorized
+  /movie/trending:
+    get:
+      summary: Get trending movies
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of trending movies
+  /movie/{id}/trailers:
+    get:
+      summary: Get movie trailers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Movie ID
+      responses:
+        '200':
+          description: Movie trailers
+  /movie/{id}/details:
+    get:
+      summary: Get movie details
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Movie ID
+      responses:
+        '200':
+          description: Movie details
+  /movie/{id}/similar:
+    get:
+      summary: Get similar movies
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Movie ID
+      responses:
+        '200':
+          description: Similar movies
+  /movie/{category}:
+    get:
+      summary: Get movies by category
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+          description: Movie category
+      responses:
+        '200':
+          description: Movies in the specified category
+  /tv/trending:
+    get:
+      summary: Get trending TV shows
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: A list of trending TV shows
+  /tv/{id}/trailers:
+    get:
+      summary: Get TV show trailers
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: TV show ID
+      responses:
+        '200':
+          description: TV show trailers
+  /tv/{id}/details:
+    get:
+      summary: Get TV show details
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: TV show ID
+      responses:
+        '200':
+          description: TV show details
+  /tv/{id}/similar:
+    get:
+      summary: Get similar TV shows
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: TV show ID
+      responses:
+        '200':
+          description: Similar TV shows
+  /tv/{category}:
+    get:
+      summary: Get TV shows by category
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: category
+          required: true
+          schema:
+            type: string
+          description: TV show category
+      responses:
+        '200':
+          description: TV shows in the specified category
+  /search/person/{query}:
+    get:
+      summary: Search for a person
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Search results for person
+  /search/movie/{query}:
+    get:
+      summary: Search for a movie
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Search results for movie
+  /search/tv/{query}:
+    get:
+      summary: Search for a TV show
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: query
+          required: true
+          schema:
+            type: string
+          description: Search query
+      responses:
+        '200':
+          description: Search results for TV show
+  /search/history:
+    get:
+      summary: Get search history
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: User's search history
+  /search/history/{id}:
+    delete:
+      summary: Remove item from search history
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: History item ID
+      responses:
+        '200':
+          description: Item removed from search history
+  /cache:
+    get:
+      summary: Get cached data
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Cached data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Data to be cached
+        '500':
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    UserSignup:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+    UserLogin:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
