@@ -11,8 +11,8 @@ import rateLimit from 'express-rate-limit'
  * @returns {Function} - The rate limiting middleware function.
  */
 const rateLimitMiddleware = rateLimit({
-  windowMs: 100, // 100ms time window
-  max: 10, // Limit each IP to 10 requests per windowMs
+  windowMs: 1000, // 1 second
+  max: 100, // Limit each IP to 100 requests per windowMs
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false // Disable the `X-RateLimit-*` headers
 })
