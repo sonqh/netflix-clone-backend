@@ -12,6 +12,8 @@ A Netflix clone built with Node.js, Express, TypeScript, and Docker. This projec
 - [Linting and Formatting](#linting-and-formatting)
 - [Configuration](#configuration)
 - [Safe Mongoose Connection](#safe-mongoose-connection)
+- [Cache](#cache)
+- [Rate Limiting](#rate-limiting)
 - [License](#license)
 
 ## Installation
@@ -149,6 +151,7 @@ The Commitlint configuration is defined in the `commitlint.config.js` file.
 
 - **Protect Route Middleware**: Defined in `protect-route.middleware.ts`
 - **Cache Middleware**: Defined in `cache.middleware.ts`
+- **Rate Limit Middleware**: Defined in `rate-limit.middleware.ts`
 
 ## Safe Mongoose Connection
 
@@ -195,3 +198,43 @@ mongoConnection.connect((url) => {
 - `onReconnected`: Called when the connection is re-established after a disconnection.
 - `onError`: Called when there is a connection error.
 - `onDisconnected`: Called when the connection is lost.
+
+## Cache
+
+The application uses Redis for caching to improve performance and reduce the load on the database. The cache middleware checks for cached data before processing a request.
+
+### Usage
+
+To use the cache middleware, import it and apply it to your routes:
+
+```typescript
+import { checkCache } from './middleware/cache.middleware'
+
+app.use('/your-route', checkCache('yourCacheKey'))
+```
+
+### Configuration
+
+The Redis configuration is defined in the `redis.config.ts` file.
+
+## Rate Limiting
+
+The application uses rate limiting to prevent abuse and ensure fair usage of the API. The rate limit middleware restricts the number of requests a client can make in a given time window.
+
+### Usage
+
+To use the rate limit middleware, import it and apply it to your routes:
+
+```typescript
+import rateLimitMiddleware from './middleware/rate-limit.middleware'
+
+app.use(rateLimitMiddleware)
+```
+
+### Configuration
+
+The rate limit configuration is defined in the `rate-limit.middleware.ts` file.
+
+## License
+
+This project is licensed under the MIT License.
